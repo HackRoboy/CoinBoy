@@ -21,10 +21,9 @@
 <body>
 {% block content %}
     <h1>Roboy Payments</h1>
-
+    <p>Scan this QR code to start the Matrix Creator on Roboy. For a new QR code refresh this page! </p>
     {% qr_from_text invoice_id %}
 
-    {{ test }}
 {% endblock %}
 </body>
 </html>
