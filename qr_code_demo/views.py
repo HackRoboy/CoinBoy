@@ -1,34 +1,9 @@
 from datetime import date
 from django.shortcuts import render
-
-from qr_code.qrcode.utils import ContactDetail, WifiConfig, Coordinates, QRCodeOptions
-
-# Use a ContactDetail instance to encapsulate the detail of the contact.
-DEMO_CONTACT = ContactDetail(
-        first_name='John',
-        last_name='Doe',
-        first_name_reading='jAAn',
-        last_name_reading='dOH',
-        tel='+41769998877',
-        email='j.doe@company.com',
-        url='http://www.company.com',
-        birthday=date(year=1985, month=10, day=2),
-        address='Cras des Fourches 987, 2800 Delémont, Jura, Switzerland',
-        memo='Development Manager',
-        org='Company Ltd',
-    )
-
-# Use a WifiConfig instance to encapsulate the configuration of the connexion.
-DEMO_WIFI = WifiConfig(
-        ssid='my-wifi',
-        authentication=WifiConfig.AUTHENTICATION.WPA,
-        password='wifi-password'
-    )
-
-DEMO_COORDINATES = Coordinates(latitude=586000.32, longitude=250954.19, altitude=500)
-
-DEMO_OPTIONS = QRCodeOptions(size='t', border=6, error_correction='L')
-
+import rpc_pb2 as ln
+import rpc_pb2_grpc as lnrpc
+import grpc
+import os
 
 def index(request):
     """
@@ -37,15 +12,29 @@ def index(request):
     :param request:
     :return: HTTP response providing the home page of this demo app.
     """
+    
+    # Due to updated ECDSA generated tls.cert we need to let gprc know that
+    # we need to use that cipher suite otherwise there will be a handhsake
+    # error when we communicate with the lnd rpc server.
+    os.environ["GRPC_SSL_CIPHER_SUITES"] = 'HIGH+ECDSA'
+
+    # Lnd cert is at ~/.lnd/tls.cert on Linux and
+    # ~/Library/Application Support/Lnd/tls.cert on Mac
+    cert = open(os.path.expanduser('~/.lnd/tls.cert'), 'rb').read()
+    creds = grpc.ssl_channel_credentials(cert)
+    channel = grpc.secure_channel('localhost:10009', creds)
+    stub = lnrpc.LightningStub(channel)
+    # Retrieve and display the wallet balance
+    #response = stub.WalletBalance(ln.WalletBalanceRequest())
+    m_request = ln.Invoice(
+        value=100,
+    )
+    response = stub.AddInvoice(m_request)
 
     # Build context for rendering QR codes.
     context = dict(
-        contact_detail=DEMO_CONTACT,
-        wifi_config=DEMO_WIFI,
-        video_id='J9go2nj6b3M',
-        google_maps_coordinates=DEMO_COORDINATES,
-        geolocation_coordinates=DEMO_COORDINATES,
-        options_example=DEMO_OPTIONS
+        #invoice_id='lntb100u1pdukkecpp505wuvr8a9jujgh80a9nkl60kns0866y73f9ekr8rw5ff0xmmu4nqdqqcqzysxwtzpe8c9pufk5v7z7794247amqh43g43w43elfeea2lpdhj84jjm57desvjp443rvhcfl7x6y5vn0wu77wt2q6h2279dw7kcn6mu6gpuj4uw6',
+	invoice_id= response.payment_request,
     )
 
     # Render the index page.
