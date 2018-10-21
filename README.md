@@ -1,6 +1,6 @@
 # CoinBoy
 
-WARNING: This is a proof-of-concept so the scripts aren't secured very tightly! Don't use this in production! Also we use the Bitcoin testnet!
+:warning: This is a proof-of-concept so the scripts aren't secured very tightly! Don't use this in production! Also we use the Bitcoin testnet! :warning:
 
 ## Installation:
 
