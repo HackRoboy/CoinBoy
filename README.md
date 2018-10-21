@@ -8,6 +8,7 @@
 * Install Ligthning Server (lnd)
 * Have a running matrix creator or some other ROS Topic which you can trigger with a lightning payment as an example we used the MatrixCreator LEDS.
 * Install the Eclair Testnet wallet on a Smartphone
+* Fund and open a Lightning channel between your Smartphone and your Node or if your node is connected to others to the network in general
 
 ## Start:
 
