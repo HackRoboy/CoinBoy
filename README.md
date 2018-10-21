@@ -2,36 +2,38 @@
 
 WARNING: This is a proof-of-concept so the scripts aren't secured very tightly! Don't use this in production! Also we use the Bitcoin testnet!
 
-## Installation/Start:
+## Installation:
 
 * Install Bitcoin Server (bitcoind) (see useful resources for helpful links)
 * Install Ligthning Server (lnd)
 * Have a running matrix creator or some other ROS Topic which you can trigger with a lightning payment as an example we used the MatrixCreator LEDS.
 * Install the Eclair Testnet wallet on a Smartphone
 
-Start the MatrixCreator
+## Start:
+
+*Start the MatrixCreator
 ```bash
 ssh into raspberry pi with the matrix creator
 roslaunch led_control leds.launch
 ```
-Start the Bitcoin Node
+*Start the Bitcoin Node
 ```bash
 bitcoind -testnet -txindex -server -zmqpubrawblock=tcp://127.0.0.1:28332 -zmqpubrawtx=tcp://127.0.0.1:28333 -rpcuser=roboy -rpcpassword=roboynorth
 ```
 
-Start the Lightning Node
+*Start the Lightning Node
 ```bash
 lnd --bitcoin.active --bitcoin.testnet --debuglevel=debug --bitcoin.node=bitcoind --bitcoind.rpcuser=roboy --bitcoind.rpcpass=roboynorth --bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332 --bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333 --nat --rpclisten=localhost:10009 --no-macaroons
 lncli -network testnet unlock
 ```
 
-Start the Webserver
+*Start the Webserver
 ```bash
 cd source-of-the-webserver
 python3 manage.py runserver 0.0.0.0:8000
 ```
 
-Start the "invoice watcher" script
+*Start the "invoice watcher" script
 ```bash
 cd source-of-the-webserver
 python3 check_payment.py
